@@ -1,12 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>~ Quetadys studio [LOBBY] ~</title>
-    <link rel="stylesheet" href="/other_pages/card_base_css.css">
+
+<meta charset="UTF-8">
+
+<title>MakiMaki</title>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #ff0000, #0022ff);
+        background-size: cover;
+        min-height: 100vh;
+        color: white;
+    }
+    button {
+        background-color: rgb(160, 160, 190);
+        color: white;
+        padding: 10px;
+        border-radius: 20px;
+        border-width: 1px;
+        
+    }
+    #preço {
+        color: red;
+        font-style: oblique;
+    }
+</style>
 </head>
+
+
+
 <body>
+
     <!-- BEGIN AADS AD UNIT 2450406 -->
 
 <div style="position: absolute; z-index: 99999">
@@ -28,9 +55,22 @@
     </div></div>
 
 <!-- END AADS AD UNIT 2450406 -->
-    <h1>QUETADYS STUDIO ~ LOBBY </h1><br>
-    <div class="card" onclick="location.href = 'other_pages/games/'">🎮 Jogos 🕹️</div>
-    <div class="card">✅ Ajude nosso studio 💵</div>
-    <div class="card">🤖 Assets gratis👾</div>
+<h1 id="titulo">MakiMaki</h1>
+
+
+<p>Preço: <span id="preço">13</span> DOGE</p>
+
+
+<button id="comprar">
+Comprar com DOGE
+</button>
+
+
+<div id="status"></div>
+
+<div class="MEB-msg">Atualizações em breve... esse jogo ainda não foi finalizado!</div>
+
+<script src="script.js"></script>
 </body>
+
 </html>
