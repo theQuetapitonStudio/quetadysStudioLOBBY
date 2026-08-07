@@ -1,31 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assets gratis</title>
-    <link rel="stylesheet" href="/other_pages/card_base_css.css">
-    <style>
-       #models {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-start;
-}
 
-.sketchfab-embed-wrapper {
-    width: 400px;
-}
+<meta charset="UTF-8">
 
-iframe {
-    width: 400px;
-    height: 300px;
-    display: block;
-}
-    </style>
+<title>MakiMaki</title>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg, #ff0000, #0022ff);
+        background-size: cover;
+        min-height: 100vh;
+        color: white;
+    }
+    button {
+        background-color: rgb(160, 160, 190);
+        color: white;
+        padding: 10px;
+        border-radius: 20px;
+        border-width: 1px;
+        
+    }
+    #preço {
+        color: red;
+        font-style: oblique;
+    }
+</style>
 </head>
+
+
+
 <body>
-        <!-- BEGIN AADS AD UNIT 2450406 -->
+
+    <!-- BEGIN AADS AD UNIT 2450406 -->
 
 <div style="position: absolute; z-index: 99999">
       <input autocomplete="off" type="checkbox" id="aadsstickymscegdan" hidden />
@@ -46,17 +55,22 @@ iframe {
     </div></div>
 
 <!-- END AADS AD UNIT 2450406 -->
-    <div class="cards">
-      <div class="card" onclick="window.location.href = 'lowpoly/'">
-        Modelos 3d Low Poly
-      </div>
-      <div class="card" onclick="location.href = 'efeitos_sonoros/'">
-        Efeito sonoros
-      </div>
+<h1 id="titulo">Zokak 3d: Low poly voxel textures</h1>
 
-      <div class="card" onclick="location.href = 'texturas/'">
-        Texturas 3d
-      </div>
-    </div>
+
+<p>Preço: <span id="preço">11</span> DOGE</p>
+
+
+<button id="comprar">
+Comprar com DOGE
+</button>
+
+
+<div id="status"></div>
+
+<div class="MEB-msg">Atualizações em breve... esse jogo ainda não foi finalizado!</div>
+
+<script src="script.js"></script>
 </body>
+
 </html>
