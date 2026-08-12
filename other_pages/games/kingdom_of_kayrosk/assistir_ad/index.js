@@ -1,0 +1,3 @@
+function assistir_ad() {
+    
+}

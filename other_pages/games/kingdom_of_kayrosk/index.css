@@ -1,0 +1,64 @@
+body {
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+
+    color: rgb(178, 175, 175);
+
+    background-image: linear-gradient(to right, red, blue)
+}
+
+button {
+    border-radius: 5px;
+    padding: 20px;
+    border-width: 0px;
+    color: rgb(0, 39, 0);
+    background: linear-gradient(to left,limegreen, yellow)
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#upgrades {
+    position: absolute;
+    right: clamp(10px, 2vw, 40px);
+    top: clamp(10px, 2vh, 30px);
+}
+
+#vantagensDiv {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: min(500px, 80vw);
+    max-height: 80vh;
+
+    padding: 25px;
+    border-radius: 15px;
+
+    background: rgba(20, 20, 20, 0.95);
+    box-sizing: border-box;
+
+    overflow-y: auto;
+}
+
+#pagamento-triploMoney {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: min(500px, 80vw);
+    max-height: 80vh;
+
+    padding: 25px;
+    border-radius: 15px;
+
+    background: rgba(20, 20, 20, 0.95);
+    box-sizing: border-box;
+
+    overflow-y: auto;
+}
