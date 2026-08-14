@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOBIQ</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:#090b10;
+    color:#e9edf5;
+    font-family:Arial,Helvetica,sans-serif;
+}
+button{
+    border:1px solid #303746;
+    background:#151a24;
+    color:#fff;
+    padding:12px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.12s;
+}
+button:hover{background:#202838}
+button:disabled{opacity:.35;cursor:not-allowed}
+.top{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:#0d1017ee;
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid #252b37;
+}
+.header{
+    max-width:1200px;
+    margin:auto;
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+.logo{
+    font-size:28px;
+    font-weight:900;
+    letter-spacing:4px;
+}
+.small{color:#8791a5;font-size:13px}
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+.resource{
+    border:1px solid #2c3340;
+    background:#10141d;
+    border-radius:14px;
+    padding:22px;
+    margin-bottom:18px;
+}
+.resource .number{
+    font-size:42px;
+    font-weight:900;
+    word-break:break-all;
+}
+.production{
+    color:#73e6a5;
+    margin-top:5px;
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:15px;
+}
+.card{
+    border:1px solid #292f3b;
+    background:#0f131b;
+    border-radius:12px;
+    padding:16px;
+}
+.card h3{
+    margin:0 0 7px;
+}
+.card p{
+    color:#929bad;
+    min-height:34px;
+}
+.cost{
+    color:#f0c86b;
+    font-size:13px;
+    margin:8px 0;
+}
+.big{
+    width:100%;
+    font-size:18px;
+    font-weight:bold;
+}
+.tabs{
+    display:flex;
+    gap:8px;
+    overflow:auto;
+    margin-bottom:18px;
+}
+.tab.active{
+    background:#e9edf5;
+    color:#080a0e;
+}
+.panel{display:none}
+.panel.active{display:block}
+.progress{
+    height:8px;
+    background:#1a202b;
+    border-radius:99px;
+    overflow:hidden;
+    margin:10px 0;
+}
+.progress div{
+    height:100%;
+    width:0%;
+    background:#73e6a5;
+}
+.log{
+    height:180px;
+    overflow:auto;
+    background:#090c12;
+    border:1px solid #252b35;
+    border-radius:8px;
+    padding:10px;
+    font-family:monospace;
+    font-size:13px;
+}
+.log div{margin-bottom:5px}
+.badge{
+    display:inline-block;
+    padding:4px 7px;
+    border-radius:5px;
+    background:#1b2230;
+    margin:3px;
+    font-size:12px;
+}
+.locked{opacity:.45}
+.achievement{
+    border:1px solid #292f3b;
+    padding:12px;
+    border-radius:9px;
+    margin-bottom:8px;
+}
+.achievement.unlocked{
+    border-color:#73e6a5;
+}
+#toast{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#161c27;
+    border:1px solid #343c4c;
+    padding:14px 18px;
+    border-radius:10px;
+    opacity:0;
+    transform:translateY(15px);
+    transition:.2s;
+    pointer-events:none;
+    z-index:100;
+}
+#toast.show{
+    opacity:1;
+    transform:translateY(0);
+}
+.danger{
+    border-color:#753c3c;
+}
+.danger:hover{background:#301919}
+@media(max-width:600px){
+    .header{align-items:flex-start;flex-direction:column}
+    .resource .number{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+    <div class="header">
+        <div>
+            <div class="logo">NOBIQ</div>
+            <div class="small">THE NUMBER FACTORY</div>
+        </div>
+
+```
+    <div>
+        <span class="small">Prestige:</span>
+        <b id="prestigeTop">0</b>
+    </div>
+</div>
+```
+
+</div>
+
+<div class="container">
+
+<div class="resource">
+    <div class="small">CURRENT NOBIQS</div>
+    <div class="number" id="nobiq">0</div>
+    <div class="production">
+        +<span id="perSec">0</span> / second
+    </div>
+
+```
+<div style="margin-top:15px">
+    <button class="big" onclick="produce()">PRINT NUMBER</button>
+</div>
+```
+
+</div>
+
+<div class="tabs">
+    <button class="tab active" data-panel="factory">Factory</button>
+    <button class="tab" data-panel="upgrades">Upgrades</button>
+    <button class="tab" data-panel="research">Research</button>
+    <button class="tab" data-panel="missions">Missions</button>
+    <button class="tab" data-panel="achievements">Achievements</button>
+    <button class="tab" data-panel="prestige">Prestige</button>
+    <button class="tab" data-panel="stats">Stats</button>
+</div>
+
+<!-- FACTORY -->
+
+<div class="panel active" id="factory">
+
+<h2>Factory</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Number Printer</h3>
+<p>Produces Nobiqs automatically.</p>
+<div>Owned: <b id="printerCount">0</b></div>
+<div class="cost">Cost: <span id="printerCost">10</span></div>
+<button class="big" onclick="buyGenerator('printer')">BUY</button>
+</div>
+
+<div class="card">
+<h3>Industrial Printer</h3>
+<p>A much faster number printer.</p>
+<div>Owned: <b id="industrialCount">0</b></div>
+<div class="cost">Cost: <span id="industrialCost">250</span></div>
+<button class="big" onclick="buyGenerator('industrial')">BUY</button>
+</div>
+
+<div class="card">
+<h3>Quantum Printer</h3>
+<p>Prints numbers that theoretically shouldn't exist.</p>
+<div>Owned: <b id="quantumCount">0</b></div>
+<div class="cost">Cost: <span id="quantumCost">10000</span></div>
+<button class="big" onclick="buyGenerator('quantum')">BUY</button>
+</div>
+
+<div class="card">
+<h3>Reality Printer</h3>
+<p>Prints numbers directly from alternate realities.</p>
+<div>Owned: <b id="realityCount">0</b></div>
+<div class="cost">Cost: <span id="realityCost">1000000</span></div>
+<button class="big" onclick="buyGenerator('reality')">BUY</button>
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+<h3>Production</h3>
+<div id="productionBreakdown"></div>
+</div>
+
+</div>
+
+<!-- UPGRADES -->
+
+<div class="panel" id="upgrades">
+
+<h2>Upgrades</h2>
+
+<div class="grid" id="upgradeGrid"></div>
+
+</div>
+
+<!-- RESEARCH -->
+
+<div class="panel" id="research">
+
+<h2>Research</h2>
+
+<div class="card">
+<div>Research Points: <b id="researchPoints">0</b></div>
+<div class="progress">
+<div id="researchBar"></div>
+</div>
+</div>
+
+<br>
+
+<div class="grid" id="researchGrid"></div>
+
+</div>
+
+<!-- MISSIONS -->
+
+<div class="panel" id="missions">
+
+<h2>Missions</h2>
+<div id="missionGrid"></div>
+
+</div>
+
+<!-- ACHIEVEMENTS -->
+
+<div class="panel" id="achievements">
+
+<h2>Achievements</h2>
+<div id="achievementGrid"></div>
+
+</div>
+
+<!-- PRESTIGE -->
+
+<div class="panel" id="prestige">
+
+<h2>Number Ascension</h2>
+
+<div class="card">
+<p>
+Reset your factory and convert your progress into
+<b>Number Cores</b>.
+</p>
+
+<div>
+Current Nobiqs:
+<b id="prestigeCurrent">0</b>
+</div>
+
+<div>
+Potential Cores:
+<b id="potentialCores">0</b>
+</div>
+
+<div style="margin-top:15px">
+<button class="big" onclick="prestige()">ASCEND</button>
+</div>
+
+<p class="small">
+Number Cores permanently increase all production.
+</p>
+</div>
+
+</div>
+
+<!-- STATS -->
+
+<div class="panel" id="stats">
+
+<h2>Statistics</h2>
+
+<div class="grid">
+
+<div class="card">
+Total produced<br>
+<b id="totalProduced">0</b>
+</div>
+
+<div class="card">
+Total clicks<br>
+<b id="totalClicks">0</b>
+</div>
+
+<div class="card">
+Play time<br>
+<b id="playTime">0s</b>
+</div>
+
+<div class="card">
+Highest Nobiq count<br>
+<b id="highest">0</b>
+</div>
+
+</div>
+
+<br>
+
+<div class="card">
+<h3>System Log</h3>
+<div class="log" id="log"></div>
+</div>
+
+<br>
+
+<button class="danger" onclick="resetGame()">RESET SAVE</button>
+
+</div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+const SAVE_KEY = "nobiq_complete_v1";
+
+let game = {
+    nobiq: 0,
+    totalProduced: 0,
+    totalClicks: 0,
+    highest: 0,
+    playTime: 0,
+
+    prestige: 0,
+    researchPoints: 0,
+
+    printer: 0,
+    industrial: 0,
+    quantum: 0,
+    reality: 0,
+
+    upgrades: {},
+    research: {},
+    achievements: {},
+    missions: {},
+
+    lastSave: Date.now(),
+    lastTick: Date.now()
+};
+
+const generators = {
+    printer:{
+        base:10,
+        power:1
+    },
+    industrial:{
+        base:250,
+        power:15
+    },
+    quantum:{
+        base:10000,
+        power:250
+    },
+    reality:{
+        base:1000000,
+        power:5000
+    }
+};
+
+const upgrades = [
+    {
+        id:"strongInk",
+        name:"Stronger Ink",
+        desc:"+25% production.",
+        cost:100,
+        effect:()=>1.25
+    },
+    {
+        id:"doubleInk",
+        name:"Double Ink",
+        desc:"Another +50% production.",
+        cost:1000,
+        effect:()=>1.5
+    },
+    {
+        id:"fastPrinter",
+        name:"Fast Printer",
+        desc:"+100% production.",
+        cost:10000,
+        effect:()=>2
+    },
+    {
+        id:"compressed",
+        name:"Compressed Numbers",
+        desc:"+300% production.",
+        cost:100000,
+        effect:()=>4
+    },
+    {
+        id:"impossible",
+        name:"Impossible Mathematics",
+        desc:"Production ×10.",
+        cost:1000000,
+        effect:()=>10
+    }
+];
+
+const research = [
+    {
+        id:"autoClick",
+        name:"Automatic Printing",
+        desc:"Manual printing becomes more powerful.",
+        cost:5
+    },
+    {
+        id:"offline",
+        name:"Offline Printing",
+        desc:"Gain offline production.",
+        cost:10
+    },
+    {
+        id:"critical",
+        name:"Critical Numbers",
+        desc:"Small chance to produce ×10.",
+        cost:20
+    },
+    {
+        id:"researchBoost",
+        name:"Scientific Method",
+        desc:"Gain more research points.",
+        cost:35
+    },
+    {
+        id:"strange",
+        name:"Strange Mathematics",
+        desc:"Unlocks mysterious events.",
+        cost:60
+    }
+];
+
+const missions = [
+    {
+        id:"m1",
+        name:"First Number",
+        desc:"Produce 1 Nobiq.",
+        goal:1,
+        type:"totalProduced",
+        reward:2
+    },
+    {
+        id:"m2",
+        name:"Getting Started",
+        desc:"Produce 1,000 Nobiqs.",
+        goal:1000,
+        type:"totalProduced",
+        reward:5
+    },
+    {
+        id:"m3",
+        name:"Printer Owner",
+        desc:"Own 10 Number Printers.",
+        goal:10,
+        type:"printer",
+        reward:10
+    },
+    {
+        id:"m4",
+        name:"Industrialist",
+        desc:"Own 10 Industrial Printers.",
+        goal:10,
+        type:"industrial",
+        reward:20
+    },
+    {
+        id:"m5",
+        name:"Millionaire",
+        desc:"Produce 1,000,000 Nobiqs.",
+        goal:1000000,
+        type:"totalProduced",
+        reward:50
+    }
+];
+
+const achievements = [
+    {
+        id:"a1",
+        name:"Hello, Number",
+        desc:"Print your first Nobiq.",
+        check:()=>game.totalProduced>=1
+    },
+    {
+        id:"a2",
+        name:"100",
+        desc:"Produce 100 Nobiqs.",
+        check:()=>game.totalProduced>=100
+    },
+    {
+        id:"a3",
+        name:"Printer Army",
+        desc:"Own 25 printers.",
+        check:()=>game.printer>=25
+    },
+    {
+        id:"a4",
+        name:"Million",
+        desc:"Produce one million Nobiqs.",
+        check:()=>game.totalProduced>=1000000
+    },
+    {
+        id:"a5",
+        name:"Ascended",
+        desc:"Prestige for the first time.",
+        check:()=>game.prestige>=1
+    },
+    {
+        id:"a6",
+        name:"Scientific",
+        desc:"Unlock 3 research upgrades.",
+        check:()=>Object.values(game.research).filter(Boolean).length>=3
+    },
+    {
+        id:"a7",
+        name:"Impossible",
+        desc:"Reach 1 billion total Nobiqs.",
+        check:()=>game.totalProduced>=1000000000
+    }
+];
+
+function format(n){
+
+    if(!Number.isFinite(n)) return "∞";
+
+    if(n < 1000)
+        return Math.floor(n).toLocaleString();
+
+    const units = [
+        "",
+        "K","M","B","T",
+        "Qa","Qi","Sx","Sp","Oc",
+        "No","Dc","Ud","Dd","Td",
+        "Qad","Qid","Sxd","Spd","Ocd",
+        "Nod"
+    ];
+
+    let i=0;
+
+    while(n>=1000 && i<units.length-1){
+        n/=1000;
+        i++;
+    }
+
+    if(n>=100)
+        return n.toFixed(0)+units[i];
+
+    if(n>=10)
+        return n.toFixed(1)+units[i];
+
+    return n.toFixed(2)+units[i];
+}
+
+function raw(n){
+    return Math.floor(n).toLocaleString();
+}
+
+function productionMultiplier(){
+
+    let mult = 1;
+
+    for(const u of upgrades){
+        if(game.upgrades[u.id])
+            mult *= u.effect();
+    }
+
+    if(game.prestige>0)
+        mult *= 1 + game.prestige * 0.25;
+
+    return mult;
+}
+
+function productionPerSecond(){
+
+    let p =
+        game.printer * generators.printer.power +
+        game.industrial * generators.industrial.power +
+        game.quantum * generators.quantum.power +
+        game.reality * generators.reality.power;
+
+    p *= productionMultiplier();
+
+    return p;
+}
+
+function generatorCost(type){
+
+    const count = game[type];
+
+    return generators[type].base * Math.pow(1.15,count);
+}
+
+function produce(){
+
+    let amount = 1;
+
+    if(game.research.autoClick)
+        amount *= 5;
+
+    if(game.research.critical && Math.random()<0.03){
+        amount *= 10;
+        log("CRITICAL NUMBER! ×10");
+        toast("CRITICAL NUMBER ×10!");
+    }
+
+    amount *= productionMultiplier();
+
+    game.nobiq += amount;
+    game.totalProduced += amount;
+    game.totalClicks++;
+
+    update();
+}
+
+function buyGenerator(type){
+
+    const cost = generatorCost(type);
+
+    if(game.nobiq < cost){
+        toast("Not enough Nobiqs.");
+        return;
+    }
+
+    game.nobiq -= cost;
+    game[type]++;
+
+    log("Bought "+type+".");
+
+    update();
+}
+
+function buyUpgrade(id){
+
+    const u = upgrades.find(x=>x.id===id);
+
+    if(game.upgrades[id]) return;
+
+    if(game.nobiq < u.cost){
+        toast("Not enough Nobiqs.");
+        return;
+    }
+
+    game.nobiq -= u.cost;
+    game.upgrades[id]=true;
+
+    log("Upgrade unlocked: "+u.name);
+    toast(u.name+" unlocked!");
+
+    update();
+}
+
+function buyResearch(id){
+
+    const r = research.find(x=>x.id===id);
+
+    if(game.research[id]) return;
+
+    if(game.researchPoints < r.cost){
+        toast("Not enough Research Points.");
+        return;
+    }
+
+    game.researchPoints -= r.cost;
+    game.research[id]=true;
+
+    log("Research complete: "+r.name);
+
+    update();
+}
+
+function prestige(){
+
+    const cores = Math.floor(Math.sqrt(game.totalProduced/100000));
+
+    if(cores < 1){
+        toast("You need at least 100,000 total Nobiqs.");
+        return;
+    }
+
+    if(!confirm(
+        "Ascend for "+cores+" Number Cores?\n\n"+
+        "Your factory will reset."
+    )) return;
+
+    game.nobiq=0;
+
+    game.printer=0;
+    game.industrial=0;
+    game.quantum=0;
+    game.reality=0;
+
+    game.upgrades={};
+
+    game.prestige += cores;
+
+    log("ASCENSION COMPLETE. +"+cores+" Number Cores.");
+
+    toast("ASCENDED! +"+cores+" CORES");
+
+    update();
+}
+
+function renderUpgrades(){
+
+    const grid=document.getElementById("upgradeGrid");
+
+    grid.innerHTML="";
+
+    for(const u of upgrades){
+
+        const owned=!!game.upgrades[u.id];
+
+        const div=document.createElement("div");
+
+        div.className="card "+(owned?"":"locked");
+
+        div.innerHTML=`
+            <h3>${u.name}</h3>
+            <p>${u.desc}</p>
+            <div class="cost">Cost: ${format(u.cost)}</div>
+            <button class="big"
+                ${owned?"disabled":""}
+                onclick="buyUpgrade('${u.id}')">
+                ${owned?"UNLOCKED":"BUY"}
+            </button>
+        `;
+
+        grid.appendChild(div);
+    }
+}
+
+function renderResearch(){
+
+    document.getElementById("researchPoints").textContent=
+        raw(game.researchPoints);
+
+    const grid=document.getElementById("researchGrid");
+
+    grid.innerHTML="";
+
+    for(const r of research){
+
+        const owned=!!game.research[r.id];
+
+        const div=document.createElement("div");
+
+        div.className="card "+(owned?"":"locked");
+
+        div.innerHTML=`
+            <h3>${r.name}</h3>
+            <p>${r.desc}</p>
+            <div class="cost">Research: ${r.cost}</div>
+            <button class="big"
+                ${owned?"disabled":""}
+                onclick="buyResearch('${r.id}')">
+                ${owned?"RESEARCHED":"RESEARCH"}
+            </button>
+        `;
+
+        grid.appendChild(div);
+    }
+}
+
+function renderMissions(){
+
+    const grid=document.getElementById("missionGrid");
+
+    grid.innerHTML="";
+
+    for(const m of missions){
+
+        const done=!!game.missions[m.id];
+
+        let value=0;
+
+        if(m.type==="totalProduced")
+            value=game.totalProduced;
+
+        else
+            value=game[m.type] || 0;
+
+        const percent=Math.min(100,value/m.goal*100);
+
+        const div=document.createElement("div");
+
+        div.className="card "+(done?"unlocked":"");
+
+        div.innerHTML=`
+            <h3>${done?"✓ ":""}${m.name}</h3>
+            <p>${m.desc}</p>
+
+            <div class="progress">
+                <div style="width:${percent}%"></div>
+            </div>
+
+            <div class="small">
+                ${format(value)} / ${format(m.goal)}
+            </div>
+
+            <div class="cost">
+                Reward: ${m.reward} Research Points
+            </div>
+
+            <button
+                class="big"
+                ${done || value<m.goal?"disabled":""}
+                onclick="claimMission('${m.id}')">
+                ${done?"CLAIMED":"CLAIM"}
+            </button>
+        `;
+
+        grid.appendChild(div);
+    }
+}
+
+function claimMission(id){
+
+    const m=missions.find(x=>x.id===id);
+
+    if(game.missions[id]) return;
+
+    let value=
+        m.type==="totalProduced"
+        ?game.totalProduced
+        :game[m.type]||0;
+
+    if(value<m.goal) return;
+
+    game.missions[id]=true;
+
+    game.researchPoints+=m.reward;
+
+    log("Mission completed: "+m.name);
+    toast("MISSION COMPLETE!");
+
+    update();
+}
+
+function renderAchievements(){
+
+    const grid=document.getElementById("achievementGrid");
+
+    grid.innerHTML="";
+
+    for(const a of achievements){
+
+        const unlocked=a.check();
+
+        if(unlocked && !game.achievements[a.id]){
+
+            game.achievements[a.id]=true;
+
+            log("Achievement unlocked: "+a.name);
+            toast("🏆 "+a.name);
+        }
+
+        const div=document.createElement("div");
+
+        div.className="achievement "+(unlocked?"unlocked":"");
+
+        div.innerHTML=`
+            <b>${unlocked?"🏆":"🔒"} ${a.name}</b>
+            <div class="small">${a.desc}</div>
+        `;
+
+        grid.appendChild(div);
+    }
+}
+
+function update(){
+
+    document.getElementById("nobiq").textContent=
+        format(game.nobiq);
+
+    document.getElementById("perSec").textContent=
+        format(productionPerSecond());
+
+    document.getElementById("prestigeTop").textContent=
+        format(game.prestige);
+
+    document.getElementById("printerCount").textContent=
+        raw(game.printer);
+
+    document.getElementById("industrialCount").textContent=
+        raw(game.industrial);
+
+    document.getElementById("quantumCount").textContent=
+        raw(game.quantum);
+
+    document.getElementById("realityCount").textContent=
+        raw(game.reality);
+
+    document.getElementById("printerCost").textContent=
+        format(generatorCost("printer"));
+
+    document.getElementById("industrialCost").textContent=
+        format(generatorCost("industrial"));
+
+    document.getElementById("quantumCost").textContent=
+        format(generatorCost("quantum"));
+
+    document.getElementById("realityCost").textContent=
+        format(generatorCost("reality"));
+
+    document.getElementById("productionBreakdown").innerHTML=`
+        Printer: ${format(game.printer*generators.printer.power)}/s<br>
+        Industrial: ${format(game.industrial*generators.industrial.power)}/s<br>
+        Quantum: ${format(game.quantum*generators.quantum.power)}/s<br>
+        Reality: ${format(game.reality*generators.reality.power)}/s<br>
+        <hr>
+        Multiplier: ×${format(productionMultiplier())}
+    `;
+
+    document.getElementById("prestigeCurrent").textContent=
+        format(game.totalProduced);
+
+    document.getElementById("potentialCores").textContent=
+        format(Math.floor(Math.sqrt(game.totalProduced/100000)));
+
+    document.getElementById("totalProduced").textContent=
+        format(game.totalProduced);
+
+    document.getElementById("totalClicks").textContent=
+        raw(game.totalClicks);
+
+    document.getElementById("highest").textContent=
+        format(game.highest);
+
+    document.getElementById("playTime").textContent=
+        formatTime(game.playTime);
+
+    renderUpgrades();
+    renderResearch();
+    renderMissions();
+    renderAchievements();
+}
+
+function formatTime(seconds){
+
+    seconds=Math.floor(seconds);
+
+    const h=Math.floor(seconds/3600);
+    const m=Math.floor((seconds%3600)/60);
+    const s=seconds%60;
+
+    if(h>0) return `${h}h ${m}m ${s}s`;
+
+    if(m>0) return `${m}m ${s}s`;
+
+    return `${s}s`;
+}
+
+function tick(){
+
+    const now=Date.now();
+
+    const delta=Math.min((now-game.lastTick)/1000,10);
+
+    game.lastTick=now;
+
+    const p=productionPerSecond();
+
+    const gain=p*delta;
+
+    if(gain>0){
+
+        game.nobiq+=gain;
+        game.totalProduced+=gain;
+
+        if(game.research.researchBoost)
+            game.researchPoints+=delta*0.01;
+    }
+
+    game.playTime+=delta;
+
+    if(game.nobiq>game.highest)
+        game.highest=game.nobiq;
+
+    update();
+}
+
+function save(){
+
+    game.lastSave=Date.now();
+
+    localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(game)
+    );
+}
+
+function load(){
+
+    const saved=localStorage.getItem(SAVE_KEY);
+
+    if(!saved) return;
+
+    try{
+
+        const old=JSON.parse(saved);
+
+        game={...game,...old};
+
+        const offlineSeconds=
+            Math.min(
+                (Date.now()-game.lastSave)/1000,
+                60*60*24*3
+            );
+
+        if(
+            offlineSeconds>10 &&
+            game.research.offline
+        ){
+
+            const gain=
+                productionPerSecond()*
+                offlineSeconds;
+
+            game.nobiq+=gain;
+            game.totalProduced+=gain;
+
+            log(
+                "Offline production: "+
+                format(gain)+
+                " Nobiqs."
+            );
+
+            setTimeout(()=>{
+                toast(
+                    "You earned "+
+                    format(gain)+
+                    " Nobiqs while away!"
+                );
+            },500);
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+}
+
+function log(message){
+
+    const el=document.getElementById("log");
+
+    if(!el) return;
+
+    const line=document.createElement("div");
+
+    line.textContent=
+        "["+
+        new Date().toLocaleTimeString()+
+        "] "+
+        message;
+
+    el.prepend(line);
+
+    while(el.children.length>100)
+        el.removeChild(el.lastChild);
+}
+
+let toastTimer;
+
+function toast(message){
+
+    const el=document.getElementById("toast");
+
+    el.textContent=message;
+
+    el.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer=setTimeout(()=>{
+        el.classList.remove("show");
+    },1800);
+}
+
+function resetGame(){
+
+    if(!confirm(
+        "Delete EVERYTHING?\n\nThis cannot be undone."
+    )) return;
+
+    localStorage.removeItem(SAVE_KEY);
+
+    location.reload();
+}
+
+/* tabs */
+
+document.querySelectorAll(".tab").forEach(btn=>{
+
+    btn.addEventListener("click",()=>{
+
+        document
+            .querySelectorAll(".tab")
+            .forEach(x=>x.classList.remove("active"));
+
+        document
+            .querySelectorAll(".panel")
+            .forEach(x=>x.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        document
+            .getElementById(btn.dataset.panel)
+            .classList.add("active");
+    });
+
+});
+
+/* keyboard */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.code==="Space"){
+
+        e.preventDefault();
+
+        produce();
+    }
+
+});
+
+/* start */
+
+load();
+
+update();
+
+setInterval(tick,1000);
+
+setInterval(save,5000);
+
+setInterval(()=>{
+    game.highest=Math.max(
+        game.highest,
+        game.nobiq
+    );
+},500);
+
+window.addEventListener("beforeunload",save);
+
+log("NOBIQ SYSTEM ONLINE.");
+log("Number production initialized.");
+log("Welcome, Number Engineer.");
+
+</script>
+
+</body>
+</html>
